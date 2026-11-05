@@ -1,0 +1,5 @@
+openssl (3.5.9+ds1-1) blueberry-pie-os; urgency=medium
+
+  * OpenSSL 3.5.9
+
+ -- Maxwell <maxwell@blueberrypieos.com>  Sun, 01 Nov 2026 11:03:41 +0000

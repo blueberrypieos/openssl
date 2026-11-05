@@ -1,0 +1,172 @@
+Description: No scripts or CMake files that no package ships
+ .
+ CA.pl, tsget, c_rehash, shlib_wrap.sh, the CMake config files and the
+ CA.pl, tsget and openssl-engine pages are not built, so their sources can
+ leave the source package.
+Author: The Blueberry Pie OS Authors
+Forwarded: not-needed
+Last-Update: 2026-11-05
+--- a/apps/build.info
++++ b/apps/build.info
+@@ -1,3 +1,4 @@
++# Modified 2026-11-05: the CA.pl and tsget scripts are not built (Apache-2.0 section 4(b)).
+ SUBDIRS=lib
+ 
+ # Program init source, that don't have direct linkage with the rest of the
+@@ -81,10 +82,4 @@ IF[{- !$disabled{apps} -}]
+     SOURCE[openssl]=openssl.rc
+   ENDIF
+ 
+-  SCRIPTS{misc}=CA.pl
+-  SOURCE[CA.pl]=CA.pl.in
+-  # linkname tells build files that a symbolic link or copy of this script
+-  # without extension must be installed as well.  Unix or Unix lookalike only.
+-  SCRIPTS{misc,linkname=tsget}=tsget.pl
+-  SOURCE[tsget.pl]=tsget.in
+ ENDIF
+--- a/exporters/build.info
++++ b/exporters/build.info
+@@ -1,12 +1,4 @@
+-# For installation: OpenSSLConfig.cmake, OpenSSLConfigVersion.cmake
+-GENERATE[OpenSSLConfig.cmake]{exporter=cmake}=cmake/OpenSSLConfig.cmake.in
+-DEPEND[OpenSSLConfig.cmake]=../installdata.pm
+-GENERATE[OpenSSLConfigVersion.cmake]{exporter=cmake}=cmake/OpenSSLConfigVersion.cmake.in
+-DEPEND[OpenSSLConfigVersion.cmake]=../installdata.pm
+-DEPEND[OpenSSLConfigVersion.cmake]=OpenSSLConfig.cmake
+-
+-DEPEND[""]=OpenSSLConfigVersion.cmake
+-
++# Modified 2026-11-05: the CMake config files are not made (Apache-2.0 section 4(b)).
+ # For installation: libcrypto.pc, libssl.pc, and openssl.pc
+ GENERATE[libcrypto.pc]{exporter=pkg-config}=pkg-config/libcrypto.pc.in
+ DEPEND[libcrypto.pc]=../installdata.pm
+--- a/tools/build.info
++++ b/tools/build.info
+@@ -1,7 +1 @@
+-{- our $c_rehash_name =
+-       $config{target} =~ /^(VC|vms)-/ ? "c_rehash.pl" : "c_rehash";
+-   "" -}
+-IF[{- !$disabled{apps} -}]
+-  SCRIPTS={- $c_rehash_name -}
+-  SOURCE[{- $c_rehash_name -}]=c_rehash.in
+-ENDIF
++# Modified 2026-11-05: the c_rehash script is not built (Apache-2.0 section 4(b)).
+--- a/util/build.info
++++ b/util/build.info
+@@ -1,7 +1,4 @@
+-IF[{- $target{build_scheme}->[1] eq "unix" -}]
+-  SCRIPTS{noinst}=shlib_wrap.sh
+-  SOURCE[shlib_wrap.sh]=shlib_wrap.sh.in
+-ENDIF
++# Modified 2026-11-05: shlib_wrap.sh is not built (Apache-2.0 section 4(b)).
+ SCRIPTS{noinst}=wrap.pl
+ SOURCE[wrap.pl]=wrap.pl.in
+ DEPEND[wrap.pl]=../configdata.pm
+--- a/build.info
++++ b/build.info
+@@ -91,6 +91,7 @@ GENERATE[include/internal/param_names.h]
+ GENERATE[include/openssl/core_names.h]=include/openssl/core_names.h.in
+ 
+ # Modified 2026-11-04: the build supplies libcrypto.ld and libssl.ld (Apache-2.0 section 4(b)).
++# Modified 2026-11-05: the CMake config files are not made (Apache-2.0 section 4(b)).
+ IF[{- defined $target{shared_defflag} -}]
+   SHARED_SOURCE[libcrypto]=libcrypto.ld
+   SHARED_SOURCE[libssl]=libssl.ld
+@@ -105,17 +106,6 @@ IF[{- $config{target} =~ /^(?:Cygwin|min
+   SHARED_SOURCE[libssl]=libssl.rc
+ ENDIF
+ 
+-# These files set the build directory up for CMake inclusion.
+-# To achieve this, their variables are taken from builddata.pm.
+-# These files are not installed; you will find the installable
+-# versions in the 'exporters' directory.
+-GENERATE[OpenSSLConfig.cmake]=exporters/cmake/OpenSSLConfig.cmake.in
+-DEPEND[OpenSSLConfig.cmake]=builddata.pm
+-GENERATE[OpenSSLConfigVersion.cmake]=exporters/cmake/OpenSSLConfigVersion.cmake.in
+-DEPEND[OpenSSLConfigVersion.cmake]=builddata.pm
+-DEPEND[OpenSSLConfigVersion.cmake]=OpenSSLConfig.cmake
+-DEPEND[""]=OpenSSLConfigVersion.cmake
+-
+ # These files set the build directory up for pkg-config use.
+ # To achieve this, their variables are taken from builddata.pm.
+ # These files are not installed; you will find the installable
+--- a/doc/build.info
++++ b/doc/build.info
+@@ -1,9 +1,6 @@
++# Modified 2026-11-05: no CA.pl, tsget or openssl-engine pages (Apache-2.0 section 4(b)).
+ SUBDIRS = man1
+ 
+-DEPEND[html/man1/CA.pl.html]=man1/CA.pl.pod
+-GENERATE[html/man1/CA.pl.html]=man1/CA.pl.pod
+-DEPEND[man/man1/CA.pl.1]=man1/CA.pl.pod
+-GENERATE[man/man1/CA.pl.1]=man1/CA.pl.pod
+ DEPEND[html/man1/openssl-asn1parse.html]=man1/openssl-asn1parse.pod
+ GENERATE[html/man1/openssl-asn1parse.html]=man1/openssl-asn1parse.pod
+ DEPEND[man/man1/openssl-asn1parse.1]=man1/openssl-asn1parse.pod
+@@ -94,12 +91,6 @@ DEPEND[man/man1/openssl-enc.1]=man1/open
+ GENERATE[man/man1/openssl-enc.1]=man1/openssl-enc.pod
+ DEPEND[man1/openssl-enc.pod]{pod}=man1/openssl-enc.pod.in
+ GENERATE[man1/openssl-enc.pod]=man1/openssl-enc.pod.in
+-DEPEND[html/man1/openssl-engine.html]=man1/openssl-engine.pod
+-GENERATE[html/man1/openssl-engine.html]=man1/openssl-engine.pod
+-DEPEND[man/man1/openssl-engine.1]=man1/openssl-engine.pod
+-GENERATE[man/man1/openssl-engine.1]=man1/openssl-engine.pod
+-DEPEND[man1/openssl-engine.pod]{pod}=man1/openssl-engine.pod.in
+-GENERATE[man1/openssl-engine.pod]=man1/openssl-engine.pod.in
+ DEPEND[html/man1/openssl-errstr.html]=man1/openssl-errstr.pod
+ GENERATE[html/man1/openssl-errstr.html]=man1/openssl-errstr.pod
+ DEPEND[man/man1/openssl-errstr.1]=man1/openssl-errstr.pod
+@@ -348,13 +339,8 @@ DEPEND[html/man1/openssl.html]=man1/open
+ GENERATE[html/man1/openssl.html]=man1/openssl.pod
+ DEPEND[man/man1/openssl.1]=man1/openssl.pod
+ GENERATE[man/man1/openssl.1]=man1/openssl.pod
+-DEPEND[html/man1/tsget.html]=man1/tsget.pod
+-GENERATE[html/man1/tsget.html]=man1/tsget.pod
+-DEPEND[man/man1/tsget.1]=man1/tsget.pod
+-GENERATE[man/man1/tsget.1]=man1/tsget.pod
+ IMAGEDOCS[man1]=
+-HTMLDOCS[man1]=html/man1/CA.pl.html \
+-html/man1/openssl-asn1parse.html \
++HTMLDOCS[man1]=html/man1/openssl-asn1parse.html \
+ html/man1/openssl-ca.html \
+ html/man1/openssl-ciphers.html \
+ html/man1/openssl-cmds.html \
+@@ -369,7 +355,6 @@ html/man1/openssl-dsaparam.html \
+ html/man1/openssl-ec.html \
+ html/man1/openssl-ecparam.html \
+ html/man1/openssl-enc.html \
+-html/man1/openssl-engine.html \
+ html/man1/openssl-errstr.html \
+ html/man1/openssl-fipsinstall.html \
+ html/man1/openssl-format-options.html \
+@@ -412,10 +397,8 @@ html/man1/openssl-verification-options.h
+ html/man1/openssl-verify.html \
+ html/man1/openssl-version.html \
+ html/man1/openssl-x509.html \
+-html/man1/openssl.html \
+-html/man1/tsget.html
+-MANDOCS[man1]=man/man1/CA.pl.1 \
+-man/man1/openssl-asn1parse.1 \
++html/man1/openssl.html
++MANDOCS[man1]=man/man1/openssl-asn1parse.1 \
+ man/man1/openssl-ca.1 \
+ man/man1/openssl-ciphers.1 \
+ man/man1/openssl-cmds.1 \
+@@ -430,7 +413,6 @@ man/man1/openssl-dsaparam.1 \
+ man/man1/openssl-ec.1 \
+ man/man1/openssl-ecparam.1 \
+ man/man1/openssl-enc.1 \
+-man/man1/openssl-engine.1 \
+ man/man1/openssl-errstr.1 \
+ man/man1/openssl-fipsinstall.1 \
+ man/man1/openssl-format-options.1 \
+@@ -473,8 +455,7 @@ man/man1/openssl-verification-options.1
+ man/man1/openssl-verify.1 \
+ man/man1/openssl-version.1 \
+ man/man1/openssl-x509.1 \
+-man/man1/openssl.1 \
+-man/man1/tsget.1
++man/man1/openssl.1
+ DEPEND[html/man3/ADMISSIONS.html]=man3/ADMISSIONS.pod
+ GENERATE[html/man3/ADMISSIONS.html]=man3/ADMISSIONS.pod
+ DEPEND[man/man3/ADMISSIONS.3]=man3/ADMISSIONS.pod

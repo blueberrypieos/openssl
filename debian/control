@@ -1,0 +1,27 @@
+Source: openssl
+Section: libs
+Priority: optional
+Maintainer: Maxwell <maxwell@blueberrypieos.com>
+Build-Depends: pietoolchain (>= 0.1.0), perl:native
+Standards-Version: 4.7.3
+Homepage: https://openssl-library.org/
+Vcs-Git: https://github.com/blueberrypieos/openssl.git -b blueberry-pie-os/latest
+Vcs-Browser: https://github.com/blueberrypieos/openssl
+Rules-Requires-Root: no
+
+Package: openssl
+Architecture: darwin-arm64
+Essential: yes
+Priority: required
+Depends: libsystem
+Description: OpenSSL 3.5: libssl, libcrypto (TLS and cryptography) and the openssl tool
+ OpenSSL shared TLS and cryptography libraries, command-line tool,
+ configuration files and manual pages.
+
+Package: openssl-dev
+Section: libdevel
+Priority: optional
+Architecture: darwin-arm64
+Depends: openssl (= ${binary:Version})
+Description: OpenSSL development files
+ Headers and pkg-config metadata for OpenSSL.

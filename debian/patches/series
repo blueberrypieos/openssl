@@ -1,0 +1,3 @@
+0001-armcap-use-the-hw.optional.arm.FEAT-sysctls-on-Darwin.patch
+0002-darwin-export-only-the-public-API-as-on-Linux.patch
+0003-no-unshipped-scripts-or-CMake-files.patch

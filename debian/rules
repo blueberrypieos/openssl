@@ -1,0 +1,58 @@
+#!/usr/bin/make -f
+# SPDX-License-Identifier: BSD-2-Clause
+# Copyright (c) 2026 The Blueberry Pie OS Authors
+
+include /usr/share/pietoolchain/rules.mk
+
+BINUTILS := $(TOOLCHAIN)/prefix/bin/aarch64-apple-darwin
+
+OSSL_OPTIONS := darwin64-arm64 --prefix=/usr --openssldir=/etc/ssl --libdir=lib shared \
+	no-engine no-legacy no-fips no-module no-docs
+OSSL_ENV := CC=../../../debian/cc-asm AR=$(BINUTILS)-ar RANLIB='$(BINUTILS)-ranlib -c' \
+	CFLAGS='$(filter-out -Os,$(BASE_CFLAGS)) -O2 -Wall' LDFLAGS='$(BASE_LDFLAGS)'
+
+MAN_VARS := MANDOCS3= MANDOCS7=
+
+all: $(OBJ)/.built
+
+$(OBJ)/.configured: $(SRCROOT)/Configure $(SRCROOT)/debian/cc-asm $(SRCROOT)/debian/rules \
+		$(SRCROOT)/debian/libcrypto.exp $(SRCROOT)/debian/libssl.exp
+	rm -rf $(OBJ)
+	mkdir -p $(OBJ)
+	cp $(SRCROOT)/debian/libcrypto.exp $(OBJ)/libcrypto.ld
+	cp $(SRCROOT)/debian/libssl.exp $(OBJ)/libssl.ld
+	cd $(OBJ) && $(OSSL_ENV) perl $(SRCROOT)/Configure $(OSSL_OPTIONS) no-tests > configure.log
+	touch $@
+
+$(OBJ)/.built: $(OBJ)/.configured
+	$(MAKE) -C $(OBJ) build_sw
+	$(MAKE) -C $(OBJ) $(MAN_VARS) build_man_docs
+	touch $@
+
+check-isa: $(OBJ)/.built
+	$(SRCROOT)/debian/check-isa llvm-objdump-21 $(OBJ)
+
+install: all check-isa
+	rm -rf $(OBJ)/dest
+	$(MAKE) -C $(OBJ) DESTDIR=$(OBJ)/dest $(MAN_VARS) install_sw install_ssldirs install_man_docs > $(OBJ)/install.log
+	set -e; for d in $(ROOT); do \
+		install -d $$d/usr/lib; \
+		for l in crypto ssl; do \
+			install -m 755 $(OBJ)/dest/usr/lib/lib$$l.3.dylib $$d/usr/lib/; \
+			ln -sf lib$$l.3.dylib $$d/usr/lib/lib$$l.dylib; \
+		done; \
+	done
+	install -d $(ROOT)/usr/include
+	cp -R $(OBJ)/dest/usr/include/openssl $(ROOT)/usr/include/
+	install -d $(ROOT)/usr/lib/pkgconfig
+	install -m 644 $(OBJ)/dest/usr/lib/pkgconfig/*.pc $(ROOT)/usr/lib/pkgconfig/
+	install -d $(ROOT)/usr/bin $(ROOT)/etc/ssl/certs
+	install -d -m 700 $(ROOT)/etc/ssl/private
+	install -m 755 $(OBJ)/dest/usr/bin/openssl $(ROOT)/usr/bin/
+	install -m 644 $(OBJ)/dest/etc/ssl/openssl.cnf $(OBJ)/dest/etc/ssl/ct_log_list.cnf $(ROOT)/etc/ssl/
+	rm $(OBJ)/dest/usr/share/man/man1/c_rehash.1ossl $(OBJ)/dest/usr/share/man/man1/engine.1ossl
+	install -d $(ROOT)/usr/share/man
+	cp -R $(OBJ)/dest/usr/share/man/man1 $(OBJ)/dest/usr/share/man/man5 $(ROOT)/usr/share/man/
+
+
+.PHONY: all check-isa install

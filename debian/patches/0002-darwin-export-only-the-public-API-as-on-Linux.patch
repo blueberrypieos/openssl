@@ -1,0 +1,47 @@
+Description: Darwin: export only the public API of libcrypto and libssl, as on Linux
+ .
+ The darwin-shared target has no shared_defflag, so libcrypto.3.dylib
+ exported every global symbol, the internal ossl_* functions too. Pass
+ -exported_symbols_list in shared_defflag. debian/libcrypto.exp and
+ debian/libssl.exp hold the names in util/libcrypto.num and util/libssl.num
+ that this configuration builds. debian/rules copies them to libcrypto.ld
+ and libssl.ld.
+Author: The Blueberry Pie OS Authors
+Forwarded: not-needed
+Last-Update: 2026-11-04
+
+--- a/Configurations/shared-info.pl
++++ b/Configurations/shared-info.pl
+@@ -6,6 +6,7 @@
+ # this file except in compliance with the License.  You can obtain a copy
+ # in the file LICENSE in the source distribution or at
+ # https://www.openssl.org/source/license.html
++# Modified 2026-10-29: Darwin exports only the public API (Apache-2.0 section 4(b)).
+ 
+ # This is a collection of extra attributes to be used as input for creating
+ # shared libraries, currently on any Unix variant, including Unix like
+@@ -50,6 +51,7 @@ my %shared_info;
+         module_ldflags        => '-bundle',
+         shared_ldflag         => '-dynamiclib -current_version $(SHLIB_VERSION_NUMBER) -compatibility_version $(SHLIB_VERSION_NUMBER)',
+         shared_sonameflag     => '-install_name $(libdir)/',
++        shared_defflag        => '-Wl,-exported_symbols_list,',
+     },
+     'cygwin-shared' => {
+         shared_ldflag         => '-shared -Wl,--enable-auto-image-base',
+--- a/build.info
++++ b/build.info
+@@ -90,13 +90,10 @@ GENERATE[crypto/params_idx.c]=crypto/par
+ GENERATE[include/internal/param_names.h]=include/internal/param_names.h.in
+ GENERATE[include/openssl/core_names.h]=include/openssl/core_names.h.in
+ 
++# Modified 2026-11-04: the build supplies libcrypto.ld and libssl.ld (Apache-2.0 section 4(b)).
+ IF[{- defined $target{shared_defflag} -}]
+   SHARED_SOURCE[libcrypto]=libcrypto.ld
+   SHARED_SOURCE[libssl]=libssl.ld
+-
+-  GENERATE[libcrypto.ld]=util/libcrypto.num libcrypto
+-  GENERATE[libssl.ld]=util/libssl.num libssl
+-  DEPEND[libcrypto.ld libssl.ld]=configdata.pm util/perl/OpenSSL/Ordinals.pm
+ ENDIF
+ 
+ IF[{- $config{target} =~ /^(?:Cygwin|mingw|VC-|BC-)/ -}]
