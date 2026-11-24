@@ -1455,14 +1455,35 @@ Files: debian/*
 Copyright: 2026 The Blueberry Pie OS Authors
 License: BSD-2-Clause
 
+Files: debian/patches/0001-armcap-use-the-hw.optional.arm.FEAT-sysctls-on-Darwin.patch
+ debian/patches/0002-darwin-export-only-the-public-API-as-on-Linux.patch
+ debian/patches/0003-no-unshipped-scripts-or-CMake-files.patch
+Copyright: 1995-2026 The OpenSSL Project Authors
+ 1995-1998 Eric A. Young, Tim J. Hudson
+ 2013-2014 Timo Teräs <timo.teras@gmail.com>
+ 2004-2014 Akamai Technologies
+ 2006 Network Resonance, Inc.
+ 2011 RTFM, Inc.
+ 2017 National Security Research Institute
+ 2002, 2017-2019 Oracle and/or its affiliates
+ 2004 EdelKey Project
+ 2014, 2020 Intel Corporation
+ 2015 CloudFlare, Inc.
+ 2016 David Gwynne <david@gwynne.id.au>
+ 2005, 2007-2020 Nokia
+ 2006 NTT (Nippon Telegraph and Telephone Corporation)
+ 2012 Samuel Neves <sneves@dei.uc.pt>
+ 2014-2016 Cryptography Research, Inc.
+ 2017 BaishanCloud
+ 2017 Ribose Inc.
+ 2019 Red Hat, Inc.
+ 2015-2020, 2022 Siemens AG
+ 2026 The Blueberry Pie OS Authors
+License: Apache-2.0
+
 Files: debian/libcrypto.exp
  debian/libssl.exp
 Copyright: 1995-2026 The OpenSSL Project Authors
-License: Apache-2.0
-
-Files: debian/patches/*.patch
-Copyright: 1995-2026 The OpenSSL Project Authors
- 2026 The Blueberry Pie OS Authors
 License: Apache-2.0
 
 License: Apache-2.0
